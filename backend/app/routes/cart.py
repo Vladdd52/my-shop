@@ -15,13 +15,13 @@ router = APIRouter(
 
 class AddToCartRequest(BaseModel):
     product_id: int
-    quantity: int
+    quantity: int = 1
     cart: Dict[int, int] = {}
 
 
 class UpdateCartRequest(BaseModel):
     product_id: int
-    quantity: int
+    quantity: int = 1
     cart: Dict[int, int] = {}
 
 
