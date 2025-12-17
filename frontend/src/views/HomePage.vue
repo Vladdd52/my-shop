@@ -3,10 +3,11 @@
     <header class="bg-white shadow-sm sticky top-0 z-40">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
         <div class="flex items-center justify-between">
-          <h1 class="text-2xl font-bold text-gray-900">Магазин</h1>
+          <h1 class="text-3xl font-bold text-gray-900">Магазин</h1>
 
-          <button @click="isCartOpen = true" class="relative p-2 text-gray-600 hover:text-gray-900">
+          <button @click="isCartOpen = true" class="relative flex items-center gap-2 p-2 text-gray-600 hover:text-gray-900">
             <ShoppingCart class="w-6 h-6" />
+            <span class="font-semibold">Корзина</span>
             <span
               v-if="cartStore.itemCount > 0"
               class="absolute -top-1 -right-1 bg-blue-600 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center"
@@ -31,12 +32,13 @@
           />
         </aside>
 
-        <main class="flex-1">
-          <div v-if="loading" class="flex justify-center items-center h-64">
+        <main class="flex-1 min-h-[600px]">
+          <div v-if="initialLoading" class="flex justify-center items-center h-64">
             <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
           </div>
 
-          <template v-else>
+          <!-- Добавляем класс для анимации -->
+          <div v-else :key="contentKey" class="content-fade-in">
             <div class="mb-6">
               <h2 class="text-xl font-semibold text-gray-900">
                 {{ currentCategoryName }}
@@ -44,7 +46,7 @@
               <p class="text-gray-600 mt-1">Найдено товаров: {{ filteredProducts.length }}</p>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div v-if="filteredProducts.length > 0" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               <ProductCard
                 v-for="product in filteredProducts"
                 :key="product.id"
@@ -54,17 +56,16 @@
               />
             </div>
 
-            <div v-if="filteredProducts.length === 0" class="text-center py-12">
+            <div v-else class="text-center py-12">
               <p class="text-gray-500">Товары не найдены</p>
             </div>
-          </template>
+          </div>
         </main>
       </div>
     </div>
 
     <CartSidebar :is-open="isCartOpen" @close="isCartOpen = false" />
 
-    <!-- Modal для просмотра товара -->
     <ProductModal
       v-if="selectedProduct"
       :product="selectedProduct"
@@ -92,8 +93,9 @@ const categories = ref([]);
 const selectedCategory = ref(null);
 const selectedProduct = ref(null);
 const searchQuery = ref('');
-const loading = ref(true);
+const initialLoading = ref(true);
 const isCartOpen = ref(false);
+const contentKey = ref(0);
 
 const currentCategoryName = computed(() => {
   if (!selectedCategory.value) return 'Все товары';
@@ -120,7 +122,6 @@ async function fetchCategories() {
 }
 
 async function fetchProducts() {
-  loading.value = true;
   try {
     const data = selectedCategory.value
       ? await shopApi.getProductsByCategory(selectedCategory.value)
@@ -128,8 +129,7 @@ async function fetchProducts() {
     products.value = data.products || [];
   } catch (error) {
     console.error('Error fetching products:', error);
-  } finally {
-    loading.value = false;
+    products.value = [];
   }
 }
 
@@ -146,12 +146,34 @@ function handleAddToCart(productId) {
   cartStore.addToCart(productId);
 }
 
-watch(selectedCategory, () => {
-  fetchProducts();
+watch(selectedCategory, async () => {
+  await fetchProducts();
+  contentKey.value++;
 });
 
-onMounted(() => {
-  fetchCategories();
-  fetchProducts();
+onMounted(async () => {
+  await fetchCategories();
+  await fetchProducts();
+  initialLoading.value = false;
 });
 </script>
+
+<style scoped>
+/* Анимация появления контента */
+.content-fade-in {
+  animation: softFade 0.3s ease-out;
+}
+
+@keyframes softFade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+:global(html) {
+  overflow-y: scroll;
+}
+</style>

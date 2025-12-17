@@ -1,9 +1,21 @@
 <template>
   <Teleport to="body">
-    <div v-if="isOpen" class="fixed inset-0 z-50">
-      <div class="absolute inset-0 bg-black bg-opacity-50" @click="$emit('close')" />
+    <!-- Плавный фон -->
+    <Transition name="fade">
+      <div
+        v-if="isOpen"
+        class="fixed inset-0 z-40 bg-black bg-opacity-50"
+        @click="$emit('close')"
+      />
+    </Transition>
 
-      <div class="absolute right-0 top-0 h-full w-full max-w-md bg-white shadow-xl flex flex-col">
+    <!-- Плавный сайдбар -->
+    <Transition name="cart">
+      <div
+        v-if="isOpen"
+        class="fixed right-0 top-0 z-50 h-full w-full max-w-md bg-white shadow-xl flex flex-col"
+      >
+        <!-- Заголовок -->
         <div class="p-4 border-b flex items-center justify-between">
           <h2 class="text-xl font-semibold">Корзина</h2>
           <button @click="$emit('close')" class="p-2 hover:bg-gray-100 rounded-lg">
@@ -11,6 +23,7 @@
           </button>
         </div>
 
+        <!-- Содержимое корзины -->
         <div class="flex-1 overflow-y-auto p-4">
           <div v-if="cartStore.cartDetails && cartStore.cartDetails.items.length > 0" class="space-y-4">
             <div
@@ -67,6 +80,7 @@
           </div>
         </div>
 
+        <!-- Подвал -->
         <div
           v-if="cartStore.cartDetails && cartStore.cartDetails.items.length > 0"
           class="border-t p-4 space-y-4"
@@ -96,7 +110,7 @@
           </button>
         </div>
       </div>
-    </div>
+    </Transition>
   </Teleport>
 </template>
 
@@ -115,3 +129,35 @@ defineEmits(['close']);
 
 const cartStore = useCartStore();
 </script>
+
+<style scoped>
+/* Плавное затемнение фона */
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.3s ease;
+}
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+}
+.fade-enter-to,
+.fade-leave-from {
+  opacity: 1;
+}
+
+/* Анимация сайдбара (выезд справа) */
+.cart-enter-active,
+.cart-leave-active {
+  transition: transform 0.3s ease, opacity 0.3s ease;
+}
+.cart-enter-from,
+.cart-leave-to {
+  transform: translateX(100%);
+  opacity: 0;
+}
+.cart-enter-to,
+.cart-leave-from {
+  transform: translateX(0);
+  opacity: 1;
+}
+</style>
