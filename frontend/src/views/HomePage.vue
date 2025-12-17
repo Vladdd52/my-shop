@@ -3,8 +3,14 @@
     <header class="bg-white shadow-sm sticky top-0 z-40">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
         <div class="flex items-center justify-between">
-          <h1 class="text-3xl font-bold text-gray-900">Магазин</h1>
+          <div>
+            <h1 class="text-3xl font-bold text-gray-900 flex items-center gap-2">
+              <ShoppingBag class="w-12 h-12 text-blue-600" />
+              FastShop
+            </h1>
+          </div>
 
+          
           <button @click="isCartOpen = true" class="relative flex items-center gap-2 p-2 text-gray-600 hover:text-gray-900">
             <ShoppingCart class="w-6 h-6" />
             <span class="font-semibold">Корзина</span>
@@ -77,7 +83,7 @@
 
 <script setup>
 import { ref, computed, onMounted, watch } from 'vue';
-import { ShoppingCart } from 'lucide-vue-next';
+import { ShoppingCart, ShoppingBag } from 'lucide-vue-next';
 import { shopApi } from '@/api/shopApi';
 import { useCartStore } from '@/stores/cart';
 import SearchBar from '@/components/SearchBar.vue';
