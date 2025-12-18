@@ -72,8 +72,8 @@ Vite 5.0.0
 
 #### 1. Клонирование репозитория
 ```bash
-git clone https://github.com/yourusername/fastapi-shop.git
-cd fastapi-shop
+git clone https://github.com/Vladdd52/my-shop.git
+cd my-shop
 ```
 
 #### 2. Backend
